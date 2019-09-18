@@ -33,9 +33,46 @@ This work is licensed under the Creative Commons Attribution 4.0 International L
 
 Things that cause synthesizer to show error message.
 
-### Generate block
+### 27.4 Loop generate constructs (×3)
 
-### `genvar` inside the `for` statement
+**Quartus documentation:**
+
+No reference to section 27.
+
+**IEEE standard:**
+
+> A loop generate construct permits a generate block to be instantiated multiple times using syntax that is similar to a for loop statement. The loop index variable shall be declared in a `genvar` declaration prior to its use in a loop generate scheme. (…)
+>
+> Generate blocks in loop generate constructs can be named or unnamed (…)
+
+**Unsupported features in Quartus:**
+
+- loop generate itself – must be enclosed in `generate ... endgenerate` block,
+- `genvar` inside for loop definition – must be declared outside for loop,
+- unnamed loop generate blocks – must be named.
+
+#### Example
+
+From `ibex/ibex_alu.sv`.
+
+Non-compatible code:
+```SystemVerilog
+for (genvar k = 0; k < 32; k++) begin
+  assign operand_a_rev[k] = operand_a_i[31-k];
+end
+```
+
+Compatible code:
+```SystemVerilog
+generate
+genvar k;
+for (k = 0; k < 32; k++) begin : gen_rev_operand_a
+  assign operand_a_rev[k] = operand_a_i[31-k];
+end
+endgenerate
+```
+
+### Other `generate` blocks
 
 ### `unique case inside` not supported
 
@@ -45,16 +82,24 @@ Things that don't cause synthesizer to show error message, but they synthesize i
 
 ### 12.5.2 Constant expression in case statement
 
+**Quartus documentation:**
+
 > | 12.4-12.5 | Selection statement | Supported (unique/priority supported only on case statements)
 > |-|--|-----|
+
+**IEEE Standard:**
+
+> A constant expression can be used for the *case_expression*. The value of the constant expression shall be compared against the *case_item_expressions*.
+
+**Unsupported features in Quartus:**
 
 The simple `case (1'b1)` for priority flag assertion or similar application usually don't work. Sometimes they do, but it's quiet unpredictable. Replace it with `if ... else if ... else`.
 
 #### Example
 
-From `ibex/ibex_cs_registers.sv`
+From `ibex/ibex_cs_registers.sv`.
 
-Non-compatible code:  
+Non-compatible code:
 ```SystemVerilog
 unique case (1'b1)
   csr_save_if_i: begin
@@ -67,7 +112,7 @@ unique case (1'b1)
 endcase
 ```
 
-Compatible code:  
+Compatible code:
 ```SystemVerilog
 if (csr_save_if_i) begin
   exception_pc = pc_if_i;
@@ -86,10 +131,12 @@ In this section you can find a few things to be alert about when doing RTL revie
 
 ### Unused pins
 
-First thing to do when there is a problem with given instance is to look at its input and output pins. If they are used in code and you can see that in Vivado they are used in RTL (so they are not optimized out in first stage) they should be used in Quartus as well. It's very simple step, but can save a lot of time while identifying the most obvious problems. The way to do it is find a problematic instance in either *Netlist Navigator* or with search functionality and poke at all input pins to see if they drive any logic and if they drive subjectively enough logic as comparison for Vivado RTL.
+First thing to do when there is a problem with given instance is to look at its input and output pins. If they are used in code and you can see that in Vivado they are used in RTL (so they are not optimized out in first stage) they should be used in Quartus as well. It's very simple step, but can save a lot of time while identifying the most obvious problems.
+
+The way to do it is find a problematic instance in either *Netlist Navigator* or with search functionality and poke at all input pins to see if they drive any logic and if they drive subjectively enough logic in comparison for Vivado RTL.
 
 ### Filter node sources
 
-Useful for `case` statement checks. If given output node should be driven by some other nodes depending on case, it should be visible in RTL. The hard way is to trace all the wires in full view. The easy way is to right click on the problematic node and select *Filter→Sources* (or *Shift+S*).
+If given output node should be driven by some other nodes depending on case, it should be visible in RTL. The hard way is to trace all the wires in full view. The easy way is to right click on the problematic node and select *Filter→Sources* (or *Shift+S*).
 
 This is particularly useful for verifying `case` statements.
