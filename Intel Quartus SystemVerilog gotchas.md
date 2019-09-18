@@ -4,48 +4,62 @@
 
 # Intel Quartus SystemVerilog gotchas
 
-In [official documentation](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#hdl/vlog/vlog_list_sys_vlog.htm) it is stated that:
+In [official documentation](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#hdl/vlog/vlog_list_sys_vlog.htm) of Intel Quartus Prime 18.1 it is stated that:
 
 > Intel® Quartus® Prime synthesis supports the following Verilog HDL language standards:
 > 
 > - SystemVerilog-2005 (IEEE Standard 1800-2005)
 > - SystemVerilog-2009 (IEEE Standard 1800-2009)
 
-Of course no one expects a tool to support all language structures and syntax. It is also stated which sections from the specification are supported and which are not. BUT it is not entirely true as you will see in next sections.
+It is also stated which sections from the specification are supported and which are not. But as you might expect it is not entirely true.
 
-In this document I would like to express my discontent with Intel Quartus SystemVerilog support and ways to work around the gotchas I stumbled upon, while porting [PULPissimo](https://github.com/pulp-platform/pulpissimo/) SoC system to Quartus.
+Of course no one expects a tool to support all language structures and syntax, but amount and severity of non-supported or misinterpreted constructs is staggering.
 
-PULPissimo project originally uses Xilinx Vivado suite for synthesis and the design has been synthesized with Synopsys toolchain as well. They don't really have support for any Altera/Intel products whatsoever.
+In this document I would like to express my discontent with Intel Quartus SystemVerilog support and ways to work around the gotchas I stumbled upon while porting [PULPissimo](https://github.com/pulp-platform/pulpissimo/) SoC system to Quartus.
 
-My goal was to port the code, which synthesized beautifully on Xilinx Vivado, to work on Altera's Cyclone V on Terasic's DE10-Nano board. To my discontent the toolchain didn't support entire codebase and reported errors for various unsupported syntax constructs. To my greater discontent after successful synthesis the design didn't work, although *the same exact code* worked like a charm with Xilinx Vivado. This resulted in countless hours trying to get it working. It resulted in loads of patches, which worked around different incompatibilities and somewhat working project.
+PULPissimo project originally utilizes Xilinx Vivado suite for synthesis and the design has been synthesized with Synopsys toolchain as well. They don't really have support for any Altera/Intel products whatsoever.
 
-All mentioned projects are submodules of this repo, so that the reader can see the code base and working code. It is divided into `<name>-base` and `<name>-patched` repos for easy comparison between project trees.
+My goal was to port the code, which synthesized beautifully on Xilinx Vivado, to work on Altera Cyclone V on Terasic DE10-Nano board. To my discontent the toolchain didn't support the code base and it reported errors for various unsupported syntax constructs.
+
+To my greater discontent after successful synthesis the design didn't work, although *the same exact code* worked like a charm with Xilinx Vivado. This resulted in countless hours spent on trying to get it working. It resulted in loads of patches, which worked around different incompatibilities.
 
 This document is currently work in progress since the porting isn't finished yet, but the author wanted to make a catalog of all the little things he stumbled upon for future reference, while working on the code.
 
-I hope that provided examples will make lives easier for those of us, who are porting some SystemVerilog code from for example Xilinx Vivado to Intel Quartus.
+I hope that provided examples will make lives easier for those of us, who are porting some SystemVerilog code from for example Xilinx Vivado to Intel Quartus or are working on making vendor-independent code.
+
+### Documentation structure
+
+All mentioned projects are submodules of this repo, so that the reader can see the code base and working code. It is divided into `<name>-base` and `<name>-patched` repos for easy comparison between project trees.
 
 As pointed in Quartus' manual, SystemVerilog specification sections will be referenced according to *IEEE Std 1800-2009 IEEE Standard for System Verilog Unified Hardware Design, Specification, and Verification Language*, which this tool is supposed to support. All unsupported features, which the documentation is claiming to support are indicated in the first paragraph of an issue section as quoted table excerpt.
 
+Then there is an excerpt from IEEE standard specification and list of all points that are not supported in a way the standard states it.
+
+The final section is a simple example with reference to a file with an unsupported structure.
+
+### License
+
 This work is licensed under the Creative Commons Attribution 4.0 International License. To view a copy of this license, visit <http://creativecommons.org/licenses/by/4.0/> or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+Copy of this license is also attached in this repository in file `LICENSE`.
 
 ## Synthesis errors
 
-Things that cause synthesizer to show error message.
+Things that cause synthesizer to show error message and fail synthesis.
 
 ### 27.4 Loop generate constructs (×3)
 
-**Quartus documentation:**
+#### Quartus documentation
 
 No reference to section 27.
 
-**IEEE standard:**
+#### IEEE standard
 
 > A loop generate construct permits a generate block to be instantiated multiple times using syntax that is similar to a for loop statement. The loop index variable shall be declared in a `genvar` declaration prior to its use in a loop generate scheme. (…)
 >
 > Generate blocks in loop generate constructs can be named or unnamed (…)
 
-**Unsupported features in Quartus:**
+#### Unsupported features in Quartus
 
 - loop generate itself – must be enclosed in `generate ... endgenerate` block,
 - `genvar` inside for loop definition – must be declared outside for loop,
@@ -82,16 +96,16 @@ Things that don't cause synthesizer to show error message, but they synthesize i
 
 ### 12.5.2 Constant expression in case statement
 
-**Quartus documentation:**
+#### Quartus documentation
 
 > | 12.4-12.5 | Selection statement | Supported (unique/priority supported only on case statements)
 > |-|--|-----|
 
-**IEEE Standard:**
+#### IEEE Standard
 
 > A constant expression can be used for the *case_expression*. The value of the constant expression shall be compared against the *case_item_expressions*.
 
-**Unsupported features in Quartus:**
+#### Unsupported features in Quartus
 
 The simple `case (1'b1)` for priority flag assertion or similar application usually don't work. Sometimes they do, but it's quiet unpredictable. Replace it with `if ... else if ... else`.
 
