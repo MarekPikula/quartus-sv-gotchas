@@ -25,17 +25,58 @@ This document is currently work in progress since the porting isn't finished yet
 
 I hope that provided examples will make lives easier for those of us, who are porting some SystemVerilog code from for example Xilinx Vivado to Intel Quartus.
 
-As pointed in Quartus' manual, SystemVerilog specification sections will be referenced according to *IEEE Std 1800-2009 IEEE Standard for System Verilog Unified Hardware Design, Specification, and Verification Language*, which this tool is supposed to support.
+As pointed in Quartus' manual, SystemVerilog specification sections will be referenced according to *IEEE Std 1800-2009 IEEE Standard for System Verilog Unified Hardware Design, Specification, and Verification Language*, which this tool is supposed to support. All unsupported features, which the documentation is claiming to support are indicated in the first paragraph of an issue section as quoted table excerpt.
 
 This work is licensed under the Creative Commons Attribution 4.0 International License. To view a copy of this license, visit <http://creativecommons.org/licenses/by/4.0/> or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 
 ## Synthesis errors
 
-There will be things that cause synthesizer to show error message.
+Things that cause synthesizer to show error message.
+
+### Generate block
+
+### `genvar` inside the `for` statement
+
+### `unique case inside` not supported
 
 ## Synthesis gotchas
 
-There will be things that don't cause synthesizer to show error message, but they synthesize bad.
+Things that don't cause synthesizer to show error message, but they synthesize in unexpected way.
+
+### 12.5.2 Constant expression in case statement
+
+> | 12.4-12.5 | Selection statement | Supported (unique/priority supported only on case statements)
+> |-|--|-----|
+
+The simple `case (1'b1)` for priority flag assertion or similar application usually don't work. Sometimes they do, but it's quiet unpredictable. Replace it with `if ... else if ... else`.
+
+#### Example
+
+From `ibex/ibex_cs_registers.sv`
+
+Non-compatible code:  
+```SystemVerilog
+unique case (1'b1)
+  csr_save_if_i: begin
+    exception_pc = pc_if_i;
+  end
+  csr_save_id_i: begin
+    exception_pc = pc_id_i;
+  end
+  default:;
+endcase
+```
+
+Compatible code:  
+```SystemVerilog
+if (csr_save_if_i) begin
+  exception_pc = pc_if_i;
+end if (csr_save_id_i) begin
+  exception_pc = pc_id_i;
+end
+```
+
+### `case` defaults sometimes not working
 
 ## Ways of verifying which parts of code don't synthesize
 
@@ -43,6 +84,12 @@ When starting to port code after successfully fixing all errors as described in 
 
 In this section you can find a few things to be alert about when doing RTL review for unwanted synthesis optimizations.
 
-### Unused input pins
+### Unused pins
 
-First thing to do when there is a problem with given instance is to look at its input pins. If they are used in code and you can see that in Vivado they are used in RTL (so they are not optimized) they should be used in Quartus as well. It's very simple step, but can save a lot of time while identifying the most obvious problems. The way to do it is find a problematic instance in either *Netlist Navigator* or with search functionality and poke at all input pins to see if they drive any logic and if they drive subjectively enough logic as comparison for Vivado RTL.
+First thing to do when there is a problem with given instance is to look at its input and output pins. If they are used in code and you can see that in Vivado they are used in RTL (so they are not optimized out in first stage) they should be used in Quartus as well. It's very simple step, but can save a lot of time while identifying the most obvious problems. The way to do it is find a problematic instance in either *Netlist Navigator* or with search functionality and poke at all input pins to see if they drive any logic and if they drive subjectively enough logic as comparison for Vivado RTL.
+
+### Filter node sources
+
+Useful for `case` statement checks. If given output node should be driven by some other nodes depending on case, it should be visible in RTL. The hard way is to trace all the wires in full view. The easy way is to right click on the problematic node and select *Filter→Sources* (or *Shift+S*).
+
+This is particularly useful for verifying `case` statements.
