@@ -26,3 +26,23 @@ This document is currently work in progress since the porting isn't finished yet
 I hope that provided examples will make lives easier for those of us, who are porting some SystemVerilog code from for example Xilinx Vivado to Intel Quartus.
 
 As pointed in Quartus' manual, SystemVerilog specification sections will be referenced according to *IEEE Std 1800-2009 IEEE Standard for System Verilog Unified Hardware Design, Specification, and Verification Language*, which this tool is supposed to support.
+
+This work is licensed under the Creative Commons Attribution 4.0 International License. To view a copy of this license, visit <http://creativecommons.org/licenses/by/4.0/> or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+## Synthesis errors
+
+There will be things that cause synthesizer to show error message.
+
+## Synthesis gotchas
+
+There will be things that don't cause synthesizer to show error message, but they synthesize bad.
+
+## Ways of verifying which parts of code don't synthesize
+
+When starting to port code after successfully fixing all errors as described in [Synthesis errors](#synthesis-errors) section you might have some specific block not working properly. To find out what's wrong you might want to review RTL if it looks OK and, to Quartus' credit, its RTL Viewer is really functional (although the author finds Vivado's RTL viewer more informative for code verification).
+
+In this section you can find a few things to be alert about when doing RTL review for unwanted synthesis optimizations.
+
+### Unused input pins
+
+First thing to do when there is a problem with given instance is to look at its input pins. If they are used in code and you can see that in Vivado they are used in RTL (so they are not optimized) they should be used in Quartus as well. It's very simple step, but can save a lot of time while identifying the most obvious problems. The way to do it is find a problematic instance in either *Netlist Navigator* or with search functionality and poke at all input pins to see if they drive any logic and if they drive subjectively enough logic as comparison for Vivado RTL.
