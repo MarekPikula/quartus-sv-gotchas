@@ -45,7 +45,7 @@ Copy of this license is also attached in this repository in file `LICENSE`.
 
 ## Synthesis errors
 
-Things that cause synthesizer to show error message and fail synthesis.
+Things that cause synthesizer to show error message and fail synthesis. If the error message is relevant it is attached in description as well.
 
 ### 27.4 Loop generate constructs (×3)
 
@@ -85,6 +85,13 @@ for (k = 0; k < 32; k++) begin : gen_rev_operand_a
 end
 endgenerate
 ```
+
+### Double semicolon
+
+It's not particularly bad thing of Quartus to point out. It doesn't like double semicolons at the end of line.
+
+Quartus might report is as error [10170](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#msgs/msgs/evrfx_veri_syntax_error.htm).
+
 
 ### Other `generate` blocks
 
