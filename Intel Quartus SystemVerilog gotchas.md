@@ -11,17 +11,22 @@ In [official documentation](https://www.intel.com/content/www/us/en/programmable
 > - SystemVerilog-2005 (IEEE Standard 1800-2005)
 > - SystemVerilog-2009 (IEEE Standard 1800-2009)
 
-It is also stated which sections from the specification are supported and which are not. But as you might expect it is not entirely true.
+It is also stated which sections from the specification are supported and which are not.
+But as you might expect it is not entirely true.
 
 Of course no one expects a tool to support all language structures and syntax, but amount and severity of non-supported or misinterpreted constructs is staggering.
 
 In this document I would like to express my discontent with Intel Quartus SystemVerilog support and ways to work around the gotchas I stumbled upon while porting [PULPissimo](https://github.com/pulp-platform/pulpissimo/) SoC system to Quartus.
 
-PULPissimo project originally utilizes Xilinx Vivado suite for synthesis and the design has been synthesized with Synopsys toolchain as well. They don't really have support for any Altera/Intel products whatsoever.
+PULPissimo project originally utilizes Xilinx Vivado suite for synthesis and the design has been synthesized with Synopsys toolchain as well.
+They don't really have support for any Altera/Intel products whatsoever.
 
-My goal was to port the code, which synthesized beautifully on Xilinx Vivado, to work on Altera Cyclone V on Terasic DE10-Nano board. To my discontent the toolchain didn't support the code base and it reported errors for various unsupported syntax constructs.
+My goal was to port the code, which synthesized beautifully on Xilinx Vivado, to work on Altera Cyclone V on Terasic DE10-Nano board.
+To my discontent the toolchain didn't support the code base and it reported errors for various unsupported syntax constructs.
 
-To my greater discontent after successful synthesis the design didn't work, although *the same exact code* worked like a charm with Xilinx Vivado. This resulted in countless hours spent on trying to get it working. It resulted in loads of patches, which worked around different incompatibilities.
+To my greater discontent after successful synthesis the design didn't work, although *the same exact code* worked like a charm with Xilinx Vivado.
+This resulted in countless hours spent on trying to get it working.
+It resulted in loads of patches, which worked around different incompatibilities.
 
 This document is currently work in progress since the porting isn't finished yet, but the author wanted to make a catalog of all the little things he stumbled upon for future reference, while working on the code.
 
@@ -29,9 +34,11 @@ I hope that provided examples will make lives easier for those of us, who are po
 
 ### Documentation structure
 
-All mentioned projects are submodules of this repo, so that the reader can see the code base and working code. It is divided into `<name>-base` and `<name>-patched` repos for easy comparison between project trees.
+All mentioned projects are submodules of this repo, so that the reader can see the code base and working code.
+It is divided into `<name>-base` and `<name>-patched` repos for easy comparison between project trees.
 
-As pointed in Quartus' manual, SystemVerilog specification sections will be referenced according to *IEEE Std 1800-2009 IEEE Standard for System Verilog Unified Hardware Design, Specification, and Verification Language*, which this tool is supposed to support. All unsupported features, which the documentation is claiming to support are indicated in the first paragraph of an issue section as quoted table excerpt.
+As pointed in Quartus' manual, SystemVerilog specification sections will be referenced according to *IEEE Std 1800-2009 IEEE Standard for System Verilog Unified Hardware Design, Specification, and Verification Language*, which this tool is supposed to support.
+All unsupported features, which the documentation is claiming to support are indicated in the first paragraph of an issue section as quoted table excerpt.
 
 Then there is an excerpt from IEEE standard specification and list of all points that are not supported in a way the standard states it.
 
@@ -39,7 +46,8 @@ The final section is a simple example with reference to a file with an unsupport
 
 ### License
 
-This work is licensed under the Creative Commons Attribution 4.0 International License. To view a copy of this license, visit <http://creativecommons.org/licenses/by/4.0/> or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+This work is licensed under the Creative Commons Attribution 4.0 International License.
+To view a copy of this license, visit <http://creativecommons.org/licenses/by/4.0/> or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 
 Copy of this license is also attached in this repository in file `LICENSE`.
 
@@ -55,7 +63,8 @@ No reference to section 27.
 
 #### IEEE standard
 
-> A loop generate construct permits a generate block to be instantiated multiple times using syntax that is similar to a for loop statement. The loop index variable shall be declared in a `genvar` declaration prior to its use in a loop generate scheme. (…)
+> A loop generate construct permits a generate block to be instantiated multiple times using syntax that is similar to a for loop statement.
+> The loop index variable shall be declared in a `genvar` declaration prior to its use in a loop generate scheme. (…)
 >
 > Generate blocks in loop generate constructs can be named or unnamed (…)
 
@@ -88,7 +97,8 @@ endgenerate
 
 ### Double semicolon
 
-It's not particularly bad thing of Quartus to point out. It doesn't like double semicolons at the end of line.
+It's not particularly bad thing of Quartus to point out.
+It doesn't like double semicolons at the end of line.
 
 Quartus might report is as error [10170](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#msgs/msgs/evrfx_veri_syntax_error.htm).
 
@@ -110,11 +120,14 @@ Things that don't cause synthesizer to show error message, but they synthesize i
 
 #### IEEE Standard
 
-> A constant expression can be used for the *case_expression*. The value of the constant expression shall be compared against the *case_item_expressions*.
+> A constant expression can be used for the *case_expression*.
+> The value of the constant expression shall be compared against the *case_item_expressions*.
 
 #### Unsupported features in Quartus
 
-The simple `case (1'b1)` for priority flag assertion or similar application usually don't work. Sometimes they do, but it's quiet unpredictable. Replace it with `if ... else if ... else`.
+The simple `case (1'b1)` for priority flag assertion or similar application usually don't work.
+Sometimes they do, but it's quiet unpredictable.
+Replace it with `if ... else if ... else`.
 
 #### Example
 
@@ -146,18 +159,23 @@ end
 
 ## Ways of verifying which parts of code don't synthesize
 
-When starting to port code after successfully fixing all errors as described in [Synthesis errors](#synthesis-errors) section you might have some specific block not working properly. To find out what's wrong you might want to review RTL if it looks OK and, to Quartus' credit, its RTL Viewer is really functional (although the author finds Vivado's RTL viewer more informative for code verification).
+When starting to port code after successfully fixing all errors as described in [Synthesis errors](#synthesis-errors) section you might have some specific block not working properly.
+To find out what's wrong you might want to review RTL if it looks OK and, to Quartus' credit, its RTL Viewer is really functional (although the author finds Vivado's RTL viewer more informative for code verification).
 
 In this section you can find a few things to be alert about when doing RTL review for unwanted synthesis optimizations.
 
 ### Unused pins
 
-First thing to do when there is a problem with given instance is to look at its input and output pins. If they are used in code and you can see that in Vivado they are used in RTL (so they are not optimized out in first stage) they should be used in Quartus as well. It's very simple step, but can save a lot of time while identifying the most obvious problems.
+First thing to do when there is a problem with given instance is to look at its input and output pins.
+If they are used in code and you can see that in Vivado they are used in RTL (so they are not optimized out in first stage) they should be used in Quartus as well.
+It's very simple step, but can save a lot of time while identifying the most obvious problems.
 
 The way to do it is find a problematic instance in either *Netlist Navigator* or with search functionality and poke at all input pins to see if they drive any logic and if they drive subjectively enough logic in comparison for Vivado RTL.
 
 ### Filter node sources
 
-If given output node should be driven by some other nodes depending on case, it should be visible in RTL. The hard way is to trace all the wires in full view. The easy way is to right click on the problematic node and select *Filter→Sources* (or *Shift+S*).
+If given output node should be driven by some other nodes depending on case, it should be visible in RTL.
+The hard way is to trace all the wires in full view.
+The easy way is to right click on the problematic node and select *Filter→Sources* (or *Shift+S*).
 
 This is particularly useful for verifying `case` statements.
