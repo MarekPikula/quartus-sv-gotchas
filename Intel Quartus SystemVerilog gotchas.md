@@ -95,15 +95,55 @@ end
 endgenerate
 ```
 
+### 27.5 Conditional generate constructs
+
+#### Quartus documentation
+
+No reference to section 27.
+
+Quartus might report is as error [10170](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#msgs/msgs/evrfx_veri_syntax_error.htm).
+
+#### IEEE standard
+
+> The conditional generate constructs, if-generate and case-generate, select at most one generate block from a set of alternative generate blocks based on constant expressions evaluated during elaboration.
+> The selected generate block, if any, is instantiated into the model.
+
+There is no mention of mandatory `generate ... endgenerate`, although in some examples it is nowhere to be found.
+
+#### Unsupported features in Quartus
+
+- conditional generate without `generate ... endgenerate` block – must be enclosed in `generate ... endgenerate`.
+
+#### Example
+
+From `ibex/ibex_core.sv`.
+
+Non-compatible code:
+```SystemVerilog
+if (PMPEnable) begin : g_pmp
+  ...
+end else begin : g_no_pmp
+  ...
+end
+```
+
+Compatible code:
+```SystemVerilog
+generate
+if (PMPEnable) begin : g_pmp
+  ...
+end else begin : g_no_pmp
+  ...
+end
+endgenerate
+```
+
 ### Double semicolon
 
 It's not particularly bad thing of Quartus to point out.
 It doesn't like double semicolons at the end of line.
 
 Quartus might report is as error [10170](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#msgs/msgs/evrfx_veri_syntax_error.htm).
-
-
-### Other `generate` blocks
 
 ### `unique case inside` not supported
 
