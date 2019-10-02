@@ -55,6 +55,52 @@ Copy of this license is also attached in this repository in file `LICENSE`.
 
 Things that cause synthesizer to show error message and fail synthesis. If the error message is relevant it is attached in description as well.
 
+### 11.4.13 Set membership operator
+
+#### Quartus documentation
+
+To Quartus' credit it is said to be not supported:
+
+> | 11.4.13 | Set membership | Not supported |
+> |-|--|-----|
+
+#### IEEE standard
+
+> SystemVerilog supports singular value sets and set membership operators.
+
+#### Unsupported features
+
+There are three basic cases of set membership:
+
+1. Specific values – `if (a inside {b, c})` can be replaced with simple `if ((a == b) || (a == c))`.
+2. Ranges – `if (a inside {[b:c]})` can be replaced with simple `if ((a >= b) && (a <= c))`.
+3. Variants thereof – combine both.
+
+### 12.5.4 Set membership case statement
+
+#### Quartus documentation
+
+Since [11.4.13](#11413-set-membership-operator) is not supported it can be easily deduced that 12.5.4 won't be supported either.
+
+> | 12.4-12.5 | Selection statement | Supported (unique/priority supported only on case statements) |
+> |-|--|-----|
+
+#### IEEE standard
+
+> The keyword `inside` can be used after the parenthesized expression to indicate a set membership (see 11.4.13).
+
+#### Unsupported features in Quartus
+
+- `case inside` construct.
+
+There is no easy way to support all cases.
+Here are some possibilities to replace this construct depending on underlying code:
+
+1. No ranges – `inside` keyword is obviously not required and can be removed.
+2. Ranges aligned to whole bits – can be replaced with `casez` and don't care values for ranges.
+For example `[3'b000:3'b011]` can be converted to `3'b0??`.
+3. Ranges not aligned to whole bits – can be either replaced with `casez` with general wildcard for given range and then inside the case further compared, or it can be translated to `if ... else if ...` construct with ranges, if parallel behaviour is not required (so no `unique` or `parallel` keyword).
+
 ### 27.4 Loop generate constructs (×3)
 
 #### Quartus documentation
@@ -145,8 +191,6 @@ It doesn't like double semicolons at the end of line.
 
 Quartus might report is as error [10170](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#msgs/msgs/evrfx_veri_syntax_error.htm).
 
-### `unique case inside` not supported
-
 ## Synthesis gotchas
 
 Things that don't cause synthesizer to show error message, but they synthesize in unexpected way.
@@ -155,7 +199,7 @@ Things that don't cause synthesizer to show error message, but they synthesize i
 
 #### Quartus documentation
 
-> | 12.4-12.5 | Selection statement | Supported (unique/priority supported only on case statements)
+> | 12.4-12.5 | Selection statement | Supported (unique/priority supported only on case statements) |
 > |-|--|-----|
 
 #### IEEE Standard
