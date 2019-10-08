@@ -53,7 +53,49 @@ Copy of this license is also attached in this repository in file `LICENSE`.
 
 ## Synthesis errors
 
-Things that cause synthesizer to show error message and fail synthesis. If the error message is relevant it is attached in description as well.
+Things that cause synthesizer to show error message and fail synthesis.
+If the error message is relevant it is attached in description as well.
+
+### 6.19 Enumerations
+
+#### Quartus documentation
+
+In general enumerations are supported.
+There are only some minor quirks in integer value expressions elaborated in _Unsupported features_ section.
+
+> | 6.19 | Enumerations | Supported |
+> |-|--|-----|
+
+Quartus might report it as error [10355](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#msgs/msgs/evrfx_sv_enum_encoded_value_width_mismatch.htm).
+
+#### IEEE standard
+
+> The integer value expressions are evaluated in the context of a cast to the `enum` base type.
+> Any enumeration encoding value that is outside the representable range of the `enum` base type shall be an error.
+
+#### Unsupported features
+
+- Integer value expressions are not evaluated in the context of a cast to the enum base type.
+  If no width is given it is assumed that given value is a 32-bit integer.
+  Solution to this issue is to explicitly state the width of constant to `enum` base type width.
+
+#### Example
+
+From `riscv-dbg/src/dm_pkg.sv`.
+
+Non-compatible code:
+```SystemVerilog
+typedef enum logic [2:0] {  CmdErrNone, CmdErrBusy, ...,
+                            CmdErrorBus, CmdErrorOther = 7
+                         } cmderr_e;
+```
+
+Compatible code:
+```SystemVerilog
+typedef enum logic [2:0] {  CmdErrNone, CmdErrBusy, ...,
+                            CmdErrorBus, CmdErrorOther = 3'd7
+                         } cmderr_e;
+```
 
 ### 11.4.13 Set membership operator
 
@@ -98,7 +140,7 @@ Here are some possibilities to replace this construct depending on underlying co
 
 1. No ranges – `inside` keyword is obviously not required and can be removed.
 2. Ranges aligned to whole bits – can be replaced with `casez` and don't care values for ranges.
-For example `[3'b000:3'b011]` can be converted to `3'b0??`.
+   For example `[3'b000:3'b011]` can be converted to `3'b0??`.
 3. Ranges not aligned to whole bits – can be either replaced with `casez` with general wildcard for given range and then inside the case further compared, or it can be translated to `if ... else if ...` construct with ranges, if parallel behaviour is not required (so no `unique` or `parallel` keyword).
 
 ### 27.4 Loop generate constructs (×3)
@@ -147,7 +189,7 @@ endgenerate
 
 No reference to section 27.
 
-Quartus might report is as error [10170](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#msgs/msgs/evrfx_veri_syntax_error.htm).
+Quartus might report it as error [10170](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#msgs/msgs/evrfx_veri_syntax_error.htm).
 
 #### IEEE standard
 
@@ -189,7 +231,7 @@ endgenerate
 It's not particularly bad thing of Quartus to point out.
 It doesn't like double semicolons at the end of line.
 
-Quartus might report is as error [10170](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#msgs/msgs/evrfx_veri_syntax_error.htm).
+Quartus might report it as error [10170](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#msgs/msgs/evrfx_veri_syntax_error.htm).
 
 ## Synthesis gotchas
 
