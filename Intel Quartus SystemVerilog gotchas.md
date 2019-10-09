@@ -58,10 +58,10 @@ If the error message is relevant it is attached in description as well.
 
 ### 6.19 Enumerations
 
-#### Quartus documentation
-
 In general enumerations are supported.
 There are only some minor quirks in integer value expressions elaborated in _Unsupported features_ section.
+
+#### Quartus documentation
 
 > | 6.19 | Enumerations | Supported |
 > |-|--|-----|
@@ -70,7 +70,7 @@ Quartus might report it as error [10355](https://www.intel.com/content/www/us/en
 
 #### IEEE standard
 
-> The integer value expressions are evaluated in the context of a cast to the `enum` base type.
+> The integer value expressions are evaluated **in the context of a cast to the `enum` base type**.
 > Any enumeration encoding value that is outside the representable range of the `enum` base type shall be an error.
 
 #### Unsupported features
@@ -108,7 +108,7 @@ To Quartus' credit it is said to be not supported:
 
 #### IEEE standard
 
-> SystemVerilog supports singular value sets and set membership operators.
+> **SystemVerilog supports singular value sets and set membership operators.**
 
 #### Unsupported features
 
@@ -129,7 +129,7 @@ Since [11.4.13](#11413-set-membership-operator) is not supported it can be easil
 
 #### IEEE standard
 
-> The keyword `inside` can be used after the parenthesized expression to indicate a set membership (see 11.4.13).
+> **The keyword `inside` can be used after the parenthesized expression to indicate a set membership** (see 11.4.13).
 
 #### Unsupported features in Quartus
 
@@ -143,6 +143,51 @@ Here are some possibilities to replace this construct depending on underlying co
    For example `[3'b000:3'b011]` can be converted to `3'b0??`.
 3. Ranges not aligned to whole bits – can be either replaced with `casez` with general wildcard for given range and then inside the case further compared, or it can be translated to `if ... else if ...` construct with ranges, if parallel behaviour is not required (so no `unique` or `parallel` keyword).
 
+### 23.2.2.3 Rules for determining port kind, data type and direction
+
+In my personal opinion Quartus' behavior in this particular case is really good as it acts as a linter reducing chances of mistype.
+
+#### Quartus documentation
+
+> | 23.2.2 | Port declarations | Supported |
+> |-|--|-----|
+
+Quartus might report it as error [10170](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#msgs/msgs/evrfx_veri_syntax_error.htm) with a comment _"expecting a direction"_.
+
+#### IEEE standard
+
+> For subsequent ports in the port list:
+>
+> - If the direction, port kind and data type are all omitted, then they shall be inherited from the previous port.
+>
+> Otherwise:
+>
+> - **If the direction is omitted, it shall be inherited from the previous port.**
+
+#### Unsupported features in Quartus
+
+- If the direction is omitted, an error is thrown – use good practice and don't omit any part of port declaration.
+
+#### Example
+
+From `riscv-dbg/src/dm_top.sv`.
+
+Non-compatible code:
+```SystemVerilog
+module dm_top #(...) (
+    ...
+    input  logic [NrHarts-1:0]    unavailable_i,
+    dm::hartinfo_t [NrHarts-1:0]  hartinfo_i,
+```
+
+Compatible code:
+```SystemVerilog
+module dm_top #(...) (
+    ...
+    input  logic [NrHarts-1:0]    unavailable_i,
+    input  dm::hartinfo_t [NrHarts-1:0]  hartinfo_i,
+```
+
 ### 27.4 Loop generate constructs (×3)
 
 #### Quartus documentation
@@ -154,7 +199,7 @@ No reference to section 27.
 > A loop generate construct permits a generate block to be instantiated multiple times using syntax that is similar to a for loop statement.
 > The loop index variable shall be declared in a `genvar` declaration prior to its use in a loop generate scheme. (…)
 >
-> Generate blocks in loop generate constructs can be named or unnamed (…)
+> Generate blocks in loop generate constructs **can be named or unnamed** (…)
 
 #### Unsupported features in Quartus
 
@@ -229,6 +274,7 @@ endgenerate
 ### Double semicolon
 
 It's not particularly bad thing of Quartus to point out.
+It could be considered a correctly assesed linter error.
 It doesn't like double semicolons at the end of line.
 
 Quartus might report it as error [10170](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#msgs/msgs/evrfx_veri_syntax_error.htm).
