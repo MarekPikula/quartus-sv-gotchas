@@ -56,6 +56,70 @@ Copy of this license is also attached in this repository in file `LICENSE`.
 Things that cause synthesizer to show error message and fail synthesis.
 If the error message is relevant it is attached in description as well.
 
+### 6.20.3 Type parameters
+
+#### Quartus documentation
+
+> | 6.20.3 | Type parameters | Not supported |
+> |-|--|-----|
+
+Quartus might report it as veriety of errors depending on context.
+The basic one is error [10170](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#msgs/msgs/evrfx_veri_syntax_error.htm) with a comment: _Verilog HDL syntax error at <location> near text: "type";  expecting an identifier ("type" is a reserved keyword )._.
+
+#### IEEE standard
+
+> A parameter constant can also specify a **data type**, allowing modules, interfaces or programs to have ports and data objects whose type is set for each instance.
+
+#### Unsupported features
+
+As indicated by Quartus documentation type parameters are not supported at all.
+Depending on context it might require different solutions.
+For example if expected type is plain `logic` or `logic` vector it is possible to parametrize the module with vector width, as seen in an example.
+The same is for other datatypes with defined bit width.
+Width of data types such as structs can be determined using `$bits()` function.
+
+#### Example
+
+Module declaration from `common_cells/src/cdc_2phase.sv`.
+
+Non-compatible code:
+```SystemVerilog
+module cdc_2phase #(
+  parameter type T = logic[31:0]
+)(
+  ...
+  input T src_data_i,
+  ...
+);
+```
+
+Compatible code:
+```SystemVerilog
+module cdc_2phase #(
+  parameter int unsigned T_w = 32
+)(
+  ...
+  input logic [T_w-1:0] src_data_i,
+  ...
+);
+```
+
+Module instantiation from `riscv-dbg/src/dmi_cdc.sv`:
+
+Non-compatible code:
+```SystemVerilog
+cdc_2phase #(.T(dm::dmi_req_t)) i_cdc_req (
+  ...
+);
+```
+
+Compatible code:
+```SystemVerilog
+cdc_2phase #(.T_w($bits(dm::dmi_req_t))) i_cdc_req (
+  ...
+);
+```
+
 ### 6.19 Enumerations
 
 In general enumerations are supported.
@@ -75,9 +139,9 @@ Quartus might report it as error [10355](https://www.intel.com/content/www/us/en
 
 #### Unsupported features
 
-- Integer value expressions are not evaluated in the context of a cast to the enum base type.
-  If no width is given it is assumed that given value is a 32-bit integer.
-  Solution to this issue is to explicitly state the width of constant to `enum` base type width.
+Integer value expressions are not evaluated in the context of a cast to the enum base type.
+If no width is given it is assumed that given value is a 32-bit integer.
+Solution to this issue is to explicitly state the width of constant to `enum` base type width.
 
 #### Example
 
@@ -133,8 +197,7 @@ Since [11.4.13](#11413-set-membership-operator) is not supported it can be easil
 
 #### Unsupported features in Quartus
 
-- `case inside` construct.
-
+As indicated by Quartus' documentation entire `case inside` construct.
 There is no easy way to support all cases.
 Here are some possibilities to replace this construct depending on underlying code:
 
@@ -166,7 +229,7 @@ Quartus might report it as error [10170](https://www.intel.com/content/www/us/en
 
 #### Unsupported features in Quartus
 
-- If the direction is omitted, an error is thrown – use good practice and don't omit any part of port declaration.
+If the direction is omitted, an error is thrown – use good practice and don't omit any part of port declaration.
 
 #### Example
 
@@ -245,7 +308,7 @@ There is no mention of mandatory `generate ... endgenerate`, although in some ex
 
 #### Unsupported features in Quartus
 
-- conditional generate without `generate ... endgenerate` block – must be enclosed in `generate ... endgenerate`.
+Conditional generate without `generate ... endgenerate` block – must be enclosed in `generate ... endgenerate`.
 
 #### Example
 
