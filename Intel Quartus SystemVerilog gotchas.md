@@ -346,50 +346,6 @@ Quartus might report it as error [10170](https://www.intel.com/content/www/us/en
 
 Things that don't cause synthesizer to show error message, but they synthesize in unexpected way.
 
-### 12.5.2 Constant expression in case statement
-
-#### Quartus documentation
-
-> | 12.4-12.5 | Selection statement | Supported (unique/priority supported only on case statements) |
-> |-|--|-----|
-
-#### IEEE Standard
-
-> A constant expression can be used for the *case_expression*.
-> The value of the constant expression shall be compared against the *case_item_expressions*.
-
-#### Unsupported features in Quartus
-
-The simple `case (1'b1)` for priority flag assertion or similar application usually don't work.
-Sometimes they do, but it's quiet unpredictable.
-Replace it with `if ... else if ... else`.
-
-#### Example
-
-From `ibex/ibex_cs_registers.sv`.
-
-Non-compatible code:
-```SystemVerilog
-unique case (1'b1)
-  csr_save_if_i: begin
-    exception_pc = pc_if_i;
-  end
-  csr_save_id_i: begin
-    exception_pc = pc_id_i;
-  end
-  default:;
-endcase
-```
-
-Compatible code:
-```SystemVerilog
-if (csr_save_if_i) begin
-  exception_pc = pc_if_i;
-end if (csr_save_id_i) begin
-  exception_pc = pc_id_i;
-end
-```
-
 ### `case` defaults sometimes not working
 
 ## Ways of verifying which parts of code don't synthesize
