@@ -4,6 +4,8 @@
 
 # Intel Quartus SystemVerilog gotchas
 
+## 1 Introduction
+
 In [official documentation](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#hdl/vlog/vlog_list_sys_vlog.htm) of Intel Quartus Prime 18.1 it is stated that:
 
 > Intel® Quartus® Prime synthesis supports the following Verilog HDL language standards:
@@ -32,7 +34,7 @@ This document is currently work in progress since the porting isn't finished yet
 
 I hope that provided examples will make lives easier for those of us, who are porting some SystemVerilog code from for example Xilinx Vivado to Intel Quartus or are working on making vendor-independent code.
 
-### Documentation structure
+### 1.1 Documentation structure
 
 All mentioned projects are submodules of this repo, so that the reader can see the code base and working code.
 It is divided into `<name>-base` and `<name>-patched` repos for easy comparison between project trees.
@@ -44,14 +46,14 @@ Then there is an excerpt from IEEE standard specification and list of all points
 
 The final section is a simple example with reference to a file with an unsupported structure.
 
-### License
+### 1.2 License
 
 This work is licensed under the Creative Commons Attribution 4.0 International License.
 To view a copy of this license, visit <http://creativecommons.org/licenses/by/4.0/> or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 
 Copy of this license is also attached in this repository in file `LICENSE`.
 
-## Synthesis errors
+## 2 Synthesis errors
 
 Things that cause synthesizer to show error message and fail synthesis.
 If the error message is relevant it is attached in description as well.
@@ -342,20 +344,20 @@ It doesn't like double semicolons at the end of line.
 
 Quartus might report it as error [10170](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#msgs/msgs/evrfx_veri_syntax_error.htm).
 
-## Synthesis gotchas
+## 3 Synthesis gotchas
 
 Things that don't cause synthesizer to show error message, but they synthesize in unexpected way.
 
-### `case` defaults sometimes not working
+### 3.1 `case` defaults sometimes not working
 
-## Ways of verifying which parts of code don't synthesize
+## 4 Ways of verifying which parts of code don't synthesize
 
 When starting to port code after successfully fixing all errors as described in [Synthesis errors](#synthesis-errors) section you might have some specific block not working properly.
 To find out what's wrong you might want to review RTL if it looks OK and, to Quartus' credit, its RTL Viewer is really functional (although the author finds Vivado's RTL viewer more informative for code verification).
 
 In this section you can find a few things to be alert about when doing RTL review for unwanted synthesis optimizations.
 
-### Unused pins
+### 4.1 Unused pins
 
 First thing to do when there is a problem with given instance is to look at its input and output pins.
 If they are used in code and you can see that in Vivado they are used in RTL (so they are not optimized out in first stage) they should be used in Quartus as well.
@@ -363,7 +365,7 @@ It's very simple step, but can save a lot of time while identifying the most obv
 
 The way to do it is find a problematic instance in either *Netlist Navigator* or with search functionality and poke at all input pins to see if they drive any logic and if they drive subjectively enough logic in comparison for Vivado RTL.
 
-### Filter node sources
+### 4.2 Filter node sources
 
 If given output node should be driven by some other nodes depending on case, it should be visible in RTL.
 The hard way is to trace all the wires in full view.
