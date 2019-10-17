@@ -4,6 +4,26 @@
 
 # Intel Quartus SystemVerilog gotchas
 
+## Table of contents
+
+- [1 Introduction](#1-introduction)
+   - [1.1 Documentation structure](#11-documentation-structure)
+   - [1.2 License](#12-license)
+- [2 Synthesis errors](#2-synthesis-errors)
+   - [6.20.3 Type parameters](#6203-type-parameters)
+   - [6.19 Enumerations](#619-enumerations)
+   - [11.4.13 Set membership operator](#11413-set-membership-operator)
+   - [12.5.4 Set membership case statement](#1254-set-membership-case-statement)
+   - [23.2.2.3 Rules for determining port kind, data type and direction](#23223-rules-for-determining-port-kind-data-type-and-direction)
+   - [27.4 Loop generate constructs (×3)](#274-loop-generate-constructs-3)
+   - [27.5 Conditional generate constructs](#275-conditional-generate-constructs)
+   - [Double semicolon](#double-semicolon)
+- [3 Synthesis gotchas](#3-synthesis-gotchas)
+   - [3.1 `case` defaults sometimes not working](#31-case-defaults-sometimes-not-working)
+- [4 Ways of verifying which parts of code don't synthesize](#4-ways-of-verifying-which-parts-of-code-dont-synthesize)
+   - [4.1 Unused pins](#41-unused-pins)
+   - [4.2 Filter node sources](#42-filter-node-sources)
+
 ## 1 Introduction
 
 In [official documentation](https://www.intel.com/content/www/us/en/programmable/quartushelp/18.1/index.htm#hdl/vlog/vlog_list_sys_vlog.htm) of Intel Quartus Prime 18.1 it is stated that:
