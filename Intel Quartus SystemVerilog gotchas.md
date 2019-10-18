@@ -126,7 +126,7 @@ module cdc_2phase #(
 );
 ```
 
-Module instantiation from `riscv-dbg/src/dmi_cdc.sv`:
+Module instantiation from `riscv-dbg/src/dmi_cdc.sv` (not yet included in submodules):
 
 Non-compatible code:
 ```SystemVerilog

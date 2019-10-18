@@ -4,3 +4,15 @@
 [submodule "common_cells-patched"]
 	path = common_cells-patched
 	url = https://github.com/MarekPikula/common_cells
+[submodule "riscv-dbg-base"]
+	path = riscv-dbg-base
+	url = https://github.com/pulp-platform/riscv-dbg
+[submodule "riscv-dbg-patched"]
+	path = riscv-dbg-patched
+	url = https://github.com/MarekPikula/riscv-dbg
+[submodule "ibex-base"]
+	path = ibex-base
+	url = https://github.com/lowRISC/ibex.git
+[submodule "ibex-patched"]
+	path = ibex-patched
+	url = https://github.com/MarekPikula/ibex.git
