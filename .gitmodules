@@ -1,0 +1,6 @@
+[submodule "common_cells-base"]
+	path = common_cells-base
+	url = https://github.com/pulp-platform/common_cells
+[submodule "common_cells-patched"]
+	path = common_cells-patched
+	url = https://github.com/MarekPikula/common_cells
