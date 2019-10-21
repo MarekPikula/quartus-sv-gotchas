@@ -7,3 +7,5 @@ include:
   - README.md
   - LICENSE.md
   - Intel Quartus SystemVerilog gotchas.md
+
+theme: jekyll-theme-cayman
