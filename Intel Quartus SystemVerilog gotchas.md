@@ -104,7 +104,7 @@ Width of data types such as structs can be determined using `$bits()` function.
 
 Module declaration from `common_cells/src/cdc_2phase.sv`.
 
-Non-compatible code:
+[Non-compatible code](https://github.com/pulp-platform/common_cells/blob/790f2385c01c83022474eede55809666209216e3/src/cdc_2phase.sv#L19...L33):
 ```SystemVerilog
 module cdc_2phase #(
   parameter type T = logic[31:0]
@@ -115,7 +115,7 @@ module cdc_2phase #(
 );
 ```
 
-Compatible code:
+[Compatible code](https://github.com/MarekPikula/common_cells/blob/f5ba73a1c513b93b7aff4a6a0cdbb199f8ef8d97/src/cdc_2phase.sv#L19...L33):
 ```SystemVerilog
 module cdc_2phase #(
   parameter int unsigned T_w = 32
@@ -128,7 +128,7 @@ module cdc_2phase #(
 
 Module instantiation from `riscv-dbg/src/dmi_cdc.sv` (not yet included in submodules):
 
-Non-compatible code:
+[Non-compatible code](https://github.com/pulp-platform/riscv-dbg/blob/daeebfeb725183f60556811a867ed53dc48ccc18/src/dmi_cdc.sv#L45):
 ```SystemVerilog
 cdc_2phase #(.T(dm::dmi_req_t)) i_cdc_req (
   ...
@@ -169,14 +169,14 @@ Solution to this issue is to explicitly state the width of constant to `enum` ba
 
 From `riscv-dbg/src/dm_pkg.sv`.
 
-Non-compatible code:
+[Non-compatible code](https://github.com/pulp-platform/riscv-dbg/blob/daeebfeb725183f60556811a867ed53dc48ccc18/src/dm_pkg.sv#L135...L138):
 ```SystemVerilog
 typedef enum logic [2:0] {  CmdErrNone, CmdErrBusy, ...,
                             CmdErrorBus, CmdErrorOther = 7
                          } cmderr_e;
 ```
 
-Compatible code:
+[Compatible code](https://github.com/MarekPikula/riscv-dbg/blob/f10d6e2dd117bedbc33edad8e200db742b823536/src/dm_pkg.sv#L135...L138):
 ```SystemVerilog
 typedef enum logic [2:0] {  CmdErrNone, CmdErrBusy, ...,
                             CmdErrorBus, CmdErrorOther = 3'd7
@@ -257,7 +257,7 @@ If the direction is omitted, an error is thrown – use good practice and don't 
 
 From `riscv-dbg/src/dm_top.sv`.
 
-Non-compatible code:
+[Non-compatible code](https://github.com/pulp-platform/riscv-dbg/blob/daeebfeb725183f60556811a867ed53dc48ccc18/src/dm_top.sv#L34):
 ```SystemVerilog
 module dm_top #(...) (
     ...
@@ -265,7 +265,7 @@ module dm_top #(...) (
     dm::hartinfo_t [NrHarts-1:0]  hartinfo_i,
 ```
 
-Compatible code:
+[Compatible code](https://github.com/MarekPikula/riscv-dbg/blob/f10d6e2dd117bedbc33edad8e200db742b823536/src/dm_top.sv#L34):
 ```SystemVerilog
 module dm_top #(...) (
     ...
@@ -294,16 +294,16 @@ No reference to section 27.
 
 #### Example
 
-From `ibex/ibex_alu.sv`.
+From `ibex/rtl/ibex_alu.sv`.
 
-Non-compatible code:
+[Non-compatible code](https://github.com/lowRISC/ibex/blob/master/rtl/ibex_alu.sv#L32...L34):
 ```SystemVerilog
 for (genvar k = 0; k < 32; k++) begin
   assign operand_a_rev[k] = operand_a_i[31-k];
 end
 ```
 
-Compatible code:
+[Compatible code](https://github.com/MarekPikula/ibex/blob/7a263f4cf8acd3ecca4ca0893888887ff07299f2/rtl/ibex_alu.sv#L32...L37):
 ```SystemVerilog
 generate
 genvar k;
@@ -336,7 +336,7 @@ Conditional generate without `generate ... endgenerate` block – must be enclos
 
 From `ibex/ibex_core.sv`.
 
-Non-compatible code:
+[Non-compatible code](https://github.com/lowRISC/ibex/blob/master/rtl/ibex_core.sv#L651...L692):
 ```SystemVerilog
 if (PMPEnable) begin : g_pmp
   ...
@@ -345,7 +345,7 @@ end else begin : g_no_pmp
 end
 ```
 
-Compatible code:
+[Compatible code](https://github.com/MarekPikula/ibex/blob/7a263f4cf8acd3ecca4ca0893888887ff07299f2/rtl/ibex_core.sv#L651...L694):
 ```SystemVerilog
 generate
 if (PMPEnable) begin : g_pmp
