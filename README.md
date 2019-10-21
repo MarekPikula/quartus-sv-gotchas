@@ -4,7 +4,7 @@ In this document I would like to express my discontent with Intel Quartus System
 
 The document is currently work in progress since the porting isn't finished yet, but the author wanted to make a catalog of all the little things he stumbled upon for future reference, while working on the code.
 
-You can find it in `Intel Quartus SystemVerilog gotchas.md` file.
+You can find it in [Intel Quartus SystemVerilog gotchas](Intel Quartus SystemVerilog gotchas.md) document.
 
-All documents in this repository are licensed under Creative Commons Attribution 4.0 International ([CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/deed)).
+All documents in this repository are licensed under Creative Commons Attribution 4.0 International ([CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/deed)). A copy of the license is in [LICENSE](LICENSE.md) file.
 
