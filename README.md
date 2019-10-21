@@ -8,3 +8,4 @@ You can find it in [Intel Quartus SystemVerilog gotchas](Intel Quartus SystemVer
 
 All documents in this repository are licensed under Creative Commons Attribution 4.0 International ([CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/deed)). A copy of the license is in [LICENSE](LICENSE.md) file.
 
+You can find GitHub pages version [here](https://marekpikula.github.io/quartus-sv-gotchas/).
